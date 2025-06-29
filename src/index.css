@@ -21,20 +21,6 @@
 }
 
 @layer components {
-  .card-swipe {
-    transition: transform 0.3s ease, opacity 0.3s ease;
-  }
-  
-  .card-swipe.swipe-left {
-    transform: translateX(-100%);
-    opacity: 0;
-  }
-  
-  .card-swipe.swipe-right {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  
   .progress-circle {
     transition: all 0.3s ease;
   }

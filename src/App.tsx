@@ -17,9 +17,7 @@ const App: React.FC = () => {
     completedDays: new Set()
   });
   const [isCardVisible, setIsCardVisible] = useState(true);
-  const [touchStart, setTouchStart] = useState<number | null>(null);
   const [animationKey, setAnimationKey] = useState(0);
-  const cardRef = useRef<HTMLDivElement>(null);
 
   // Load progress from localStorage
   useEffect(() => {
@@ -102,46 +100,6 @@ const App: React.FC = () => {
   };
 
 
-  // Touch handlers for swipe navigation
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchStart(e.targetTouches[0].clientX);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!touchStart) return;
-    
-    const currentTouch = e.targetTouches[0].clientX;
-    const diff = touchStart - currentTouch;
-    
-    if (cardRef.current) {
-      cardRef.current.style.transform = `translateX(${-diff}px)`;
-    }
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (!touchStart) return;
-    
-    const currentTouch = e.changedTouches[0].clientX;
-    const diff = touchStart - currentTouch;
-    
-    if (cardRef.current) {
-      cardRef.current.style.transform = 'translateX(0)';
-    }
-    
-    if (Math.abs(diff) > 50) {
-      if (diff > 0 && currentWordIndex < currentWords.length - 1) {
-        nextCard();
-      } else if (diff < 0 && currentWordIndex > 0) {
-        setIsCardVisible(false);
-        setTimeout(() => {
-          setCurrentWordIndex(prev => prev - 1);
-          setIsCardVisible(true);
-        }, 300);
-      }
-    }
-    
-    setTouchStart(null);
-  };
 
   const getDayProgress = () => {
     const dayWords = Array.from({length: 5}, (_, i) => (currentDay - 1) * 5 + i);
@@ -250,15 +208,9 @@ const App: React.FC = () => {
           ))}
         </div>
 
-        {/* Verb Card */}
-        <div
-          ref={cardRef}
-          className={`card-swipe ${isCardVisible ? 'opacity-100' : 'opacity-0'}`}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-        >
-          <div className="bg-white rounded-2xl shadow-2xl p-6 mb-6">
+        {/* Word Card - Full Height */}
+        <div className={`${isCardVisible ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}>
+          <div className="bg-white rounded-2xl shadow-2xl p-6 mb-4 min-h-[calc(100vh-200px)] flex flex-col justify-center">
             {/* Verb Progress */}
             <div className="flex justify-center gap-2 mb-4">
               {currentWords.map((_, i) => (
@@ -358,8 +310,8 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Navigation Arrows */}
-        <div className="flex justify-between">
+        {/* Navigation Arrows - Touch Friendly */}
+        <div className="flex justify-between gap-4">
           <button
             onClick={() => {
               if (currentWordIndex > 0) {
@@ -371,14 +323,14 @@ const App: React.FC = () => {
               }
             }}
             disabled={currentWordIndex === 0}
-            className="px-6 py-3 bg-white/20 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 py-4 bg-white/20 text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed text-lg font-medium active:bg-white/30 transition-colors"
           >
             ← Назад
           </button>
           <button
             onClick={nextCard}
             disabled={currentWordIndex === currentWords.length - 1}
-            className="px-6 py-3 bg-white/20 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 py-4 bg-white/20 text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed text-lg font-medium active:bg-white/30 transition-colors"
           >
             Далее →
           </button>
