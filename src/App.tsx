@@ -8,6 +8,7 @@ interface Progress {
 }
 
 const App: React.FC = () => {
+  const [showWelcome, setShowWelcome] = useState(true);
   const [currentDay, setCurrentDay] = useState(1);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [progress, setProgress] = useState<Progress>({
@@ -30,6 +31,7 @@ const App: React.FC = () => {
         completedDays: new Set(parsed.completedDays)
       });
       setCurrentDay(parsed.day);
+      setShowWelcome(false); // Hide welcome if user has progress
     }
   }, []);
 
@@ -154,6 +156,30 @@ const App: React.FC = () => {
     return progress.learnedWords.has(wordId);
   };
 
+  // Welcome Screen
+  if (showWelcome) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 to-purple-700 p-4">
+        <div className="max-w-md mx-auto text-center">
+          <div className="text-6xl mb-6">🎓</div>
+          <h1 className="text-3xl font-bold text-white mb-4">
+            Изучение английских слов
+          </h1>
+          <p className="text-white/80 text-lg mb-8 leading-relaxed">
+            50 слов за 10 дней<br />
+            С эмодзи и примерами
+          </p>
+          <button
+            onClick={() => setShowWelcome(false)}
+            className="w-full bg-white text-blue-600 font-bold text-xl py-4 px-8 rounded-2xl hover:bg-blue-50 transition-colors shadow-lg"
+          >
+            Начать обучение
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (!currentWord) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 to-purple-700">
@@ -227,8 +253,8 @@ const App: React.FC = () => {
             </div>
 
             {/* Emoji Visual Learning */}
-            <div className="w-full h-48 rounded-xl mb-4 flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100 border-2 border-blue-200 shadow-lg">
-              <div className="text-8xl mb-4 animate-bounce">
+            <div className="w-full h-48 rounded-xl mb-4 flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100 border-2 border-blue-200 shadow-lg">
+              <div className="text-9xl animate-bounce">
                 {(() => {
                   const emojiMap: { [key: string]: string } = {
                     'cat': '🐱', 'dog': '🐶', 'happy': '😊', 'water': '💧', 'book': '📖',
@@ -245,8 +271,6 @@ const App: React.FC = () => {
                   return emojiMap[currentWord.en.toLowerCase()] || '🎬';
                 })()}
               </div>
-              <div className="font-bold text-xl text-blue-800 mb-1">{currentWord.en}</div>
-              <div className="text-sm text-blue-600 font-medium">Emoji Learning 🎯</div>
             </div>
 
             {/* English Word */}
