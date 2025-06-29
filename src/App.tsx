@@ -9,6 +9,7 @@ interface Progress {
 
 const App: React.FC = () => {
   const [showWelcome, setShowWelcome] = useState(true);
+  const [showDayComplete, setShowDayComplete] = useState(false);
   const [currentDay, setCurrentDay] = useState(1);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [progress, setProgress] = useState<Progress>({
@@ -71,20 +72,23 @@ const App: React.FC = () => {
       learnedWords: newLearnedWords
     }));
 
-    // Check if this completes the day (just for marking as complete, no auto-advance)
+    // Check if this completes the day
     const dayWords = Array.from({length: 5}, (_, i) => (currentDay - 1) * 5 + i);
     const completedWordsInDay = dayWords.filter(id => newLearnedWords.has(id)).length;
     
     if (completedWordsInDay === 5) {
-      // Day completed - mark as complete but don't auto-advance
+      // Day completed - mark as complete and show congratulations
       setProgress(prev => ({
         ...prev,
         completedDays: new Set([...prev.completedDays, currentDay])
       }));
-    }
-
-    // Always just move to next card if available
-    if (currentWordIndex < currentWords.length - 1) {
+      
+      // Show congratulations screen after a short delay
+      setTimeout(() => {
+        setShowDayComplete(true);
+      }, 500);
+    } else if (currentWordIndex < currentWords.length - 1) {
+      // Move to next card if available
       nextCard();
     }
   };
@@ -129,6 +133,66 @@ const App: React.FC = () => {
             className="w-full bg-white text-blue-600 font-bold text-xl py-4 px-8 rounded-2xl hover:bg-blue-50 transition-colors shadow-lg"
           >
             Начать обучение
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Day Complete Congratulations Screen
+  if (showDayComplete) {
+    const nextDay = currentDay + 1;
+    const isLastDay = currentDay === 10;
+    
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-600 to-blue-600 p-4">
+        <div className="max-w-md mx-auto text-center">
+          <div className="text-8xl mb-6">🎉</div>
+          <h1 className="text-4xl font-bold text-white mb-4">
+            Отлично!
+          </h1>
+          <p className="text-white/90 text-xl mb-2 font-semibold">
+            День {currentDay} завершён!
+          </p>
+          <p className="text-white/80 text-lg mb-8 leading-relaxed">
+            {isLastDay 
+              ? "Поздравляем! Вы изучили все 50 слов!" 
+              : `Вы изучили 5 новых слов.\nПереходим к дню ${nextDay}?`
+            }
+          </p>
+          
+          {!isLastDay ? (
+            <button
+              onClick={() => {
+                setCurrentDay(nextDay);
+                setCurrentWordIndex(0);
+                setProgress(prev => ({ ...prev, day: nextDay }));
+                setShowDayComplete(false);
+              }}
+              className="w-full bg-white text-green-600 font-bold text-xl py-5 px-8 rounded-2xl hover:bg-green-50 transition-colors shadow-lg mb-4"
+            >
+              Перейти к дню {nextDay} →
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                setCurrentDay(1);
+                setCurrentWordIndex(0);
+                setProgress({ day: 1, learnedWords: new Set(), completedDays: new Set() });
+                setShowDayComplete(false);
+                localStorage.removeItem('wordsProgress');
+              }}
+              className="w-full bg-white text-green-600 font-bold text-xl py-5 px-8 rounded-2xl hover:bg-green-50 transition-colors shadow-lg mb-4"
+            >
+              Начать заново 🔄
+            </button>
+          )}
+          
+          <button
+            onClick={() => setShowDayComplete(false)}
+            className="w-full bg-white/20 text-white font-medium text-lg py-3 px-6 rounded-xl hover:bg-white/30 transition-colors"
+          >
+            Остаться на дне {currentDay}
           </button>
         </div>
       </div>
