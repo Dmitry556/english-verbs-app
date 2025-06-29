@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  body {
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    touch-action: manipulation;
+  }
+}
+
+@layer components {
+  .card-swipe {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+  
+  .card-swipe.swipe-left {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  
+  .card-swipe.swipe-right {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  
+  .progress-circle {
+    transition: all 0.3s ease;
+  }
+  
+  .speak-button {
+    @apply bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full transition-colors duration-200;
+  }
+  
+  .speak-button:active {
+    @apply bg-blue-700;
+  }
+}
