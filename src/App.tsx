@@ -144,7 +144,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 to-purple-700 p-4">
+    <div className="h-screen bg-gradient-to-br from-blue-600 to-purple-700 p-4 overflow-y-auto overscroll-behavior-none">
       <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="text-center mb-6">
@@ -208,9 +208,9 @@ const App: React.FC = () => {
           ))}
         </div>
 
-        {/* Word Card - Full Height */}
+        {/* Word Card - Bigger Scale */}
         <div className={`${isCardVisible ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}>
-          <div className="bg-white rounded-2xl shadow-2xl p-6 mb-4 min-h-[calc(100vh-200px)] flex flex-col justify-center">
+          <div className="bg-white rounded-3xl shadow-2xl p-8 mb-4 min-h-[calc(100vh-180px)] flex flex-col justify-center scale-105">
             {/* Verb Progress */}
             <div className="flex justify-center gap-2 mb-4">
               {currentWords.map((_, i) => (
@@ -227,9 +227,9 @@ const App: React.FC = () => {
               ))}
             </div>
 
-            {/* Small Emoji Box */}
-            <div className="w-24 h-24 mx-auto rounded-xl mb-6 flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100 border-2 border-blue-200 shadow-lg">
-              <div key={animationKey} className="text-5xl emoji-gentle-bounce">
+            {/* Emoji Box */}
+            <div className="w-28 h-28 mx-auto rounded-xl mb-8 flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100 border-2 border-blue-200 shadow-lg">
+              <div key={animationKey} className="text-6xl emoji-gentle-bounce">
                 {(() => {
                   const emojiMap: { [key: string]: string } = {
                     'cat': '🐱', 'dog': '🐶', 'happy': '😊', 'water': '💧', 'book': '📖',
@@ -249,14 +249,14 @@ const App: React.FC = () => {
             </div>
 
             {/* PROMINENT English Word */}
-            <div className="text-center mb-4">
-              <div className="flex items-center justify-center gap-4 mb-4">
-                <h1 className="text-6xl font-bold text-gray-800 tracking-wide">
+            <div className="text-center mb-6">
+              <div className="flex items-center justify-center gap-4 mb-6">
+                <h1 className="text-7xl font-bold text-gray-800 tracking-wide">
                   {currentWord.en}
                 </h1>
                 <button
                   onClick={() => speakText(currentWord.en)}
-                  className="speak-button text-lg"
+                  className="speak-button text-xl"
                   aria-label="Произнести слово"
                 >
                   🔊
@@ -264,27 +264,27 @@ const App: React.FC = () => {
               </div>
               
               {/* Russian Translation */}
-              <div className="text-3xl text-gray-600 font-medium">
+              <div className="text-4xl text-gray-600 font-medium">
                 {currentWord.ru}
               </div>
             </div>
 
             {/* Example Sentence */}
-            <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-5 mb-6 border-2 border-purple-100">
-              <div className="text-center mb-2">
-                <div className="text-sm font-semibold text-purple-600 uppercase tracking-wide">
+            <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-6 mb-8 border-2 border-purple-100">
+              <div className="text-center mb-3">
+                <div className="text-base font-semibold text-purple-600 uppercase tracking-wide">
                   Пример использования
                 </div>
               </div>
               <div className="flex items-center gap-4">
                 <div className="flex-1 text-center">
-                  <div className="text-lg font-medium text-gray-800 leading-relaxed italic">
+                  <div className="text-xl font-medium text-gray-800 leading-relaxed italic">
                     "{currentWord.ex}"
                   </div>
                 </div>
                 <button
                   onClick={() => speakText(currentWord.ex)}
-                  className="speak-button flex-shrink-0 bg-purple-500 hover:bg-purple-600 text-white rounded-full p-3 transition-colors"
+                  className="speak-button flex-shrink-0 bg-purple-500 hover:bg-purple-600 text-white rounded-full p-4 transition-colors text-lg"
                   aria-label="Произнести пример"
                 >
                   🔊
