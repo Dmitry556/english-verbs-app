@@ -144,8 +144,8 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="h-screen bg-gradient-to-br from-blue-600 to-purple-700 p-4 overflow-y-auto overscroll-behavior-none">
-      <div className="max-w-md mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 to-purple-700 p-4 overscroll-behavior-none">
+      <div className="max-w-md mx-auto pb-4">
         {/* Header */}
         <div className="text-center mb-6">
           <h1 className="text-2xl font-bold text-white mb-2">
@@ -208,9 +208,9 @@ const App: React.FC = () => {
           ))}
         </div>
 
-        {/* Word Card - Bigger Scale */}
+        {/* Word Card - Bigger */}
         <div className={`${isCardVisible ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}>
-          <div className="bg-white rounded-3xl shadow-2xl p-8 mb-4 min-h-[calc(100vh-180px)] flex flex-col justify-center scale-105">
+          <div className="bg-white rounded-3xl shadow-2xl p-8 mb-6 min-h-[60vh] flex flex-col justify-center">
             {/* Verb Progress */}
             <div className="flex justify-center gap-2 mb-4">
               {currentWords.map((_, i) => (
@@ -310,8 +310,8 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Navigation Arrows - Touch Friendly */}
-        <div className="flex justify-between gap-4">
+        {/* Navigation Arrows - Fixed Bottom */}
+        <div className="flex justify-between gap-4 mt-auto pt-4">
           <button
             onClick={() => {
               if (currentWordIndex > 0) {
@@ -323,14 +323,14 @@ const App: React.FC = () => {
               }
             }}
             disabled={currentWordIndex === 0}
-            className="flex-1 py-4 bg-white/20 text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed text-lg font-medium active:bg-white/30 transition-colors"
+            className="flex-1 py-3 bg-white/20 text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed text-base font-medium active:bg-white/30 transition-colors"
           >
             ← Назад
           </button>
           <button
             onClick={nextCard}
             disabled={currentWordIndex === currentWords.length - 1}
-            className="flex-1 py-4 bg-white/20 text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed text-lg font-medium active:bg-white/30 transition-colors"
+            className="flex-1 py-3 bg-white/20 text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed text-base font-medium active:bg-white/30 transition-colors"
           >
             Далее →
           </button>
