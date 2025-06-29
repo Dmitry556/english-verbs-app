@@ -292,17 +292,17 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            {/* Action Button - Big */}
-            <div className="flex justify-center">
+            {/* Action Button - Full Width */}
+            <div className="text-center">
               {!isCurrentWordLearned() ? (
                 <button
                   onClick={handleLearnedWord}
-                  className="w-4/5 bg-green-500 hover:bg-green-600 text-white font-bold py-5 px-8 rounded-2xl transition-colors text-2xl shadow-lg"
+                  className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-5 px-8 rounded-2xl transition-colors text-2xl shadow-lg"
                 >
                   ✓ Запомнил
                 </button>
               ) : (
-                <div className="w-4/5 bg-green-100 text-green-800 font-bold py-5 px-8 rounded-2xl text-2xl text-center shadow-lg">
+                <div className="w-full bg-green-100 text-green-800 font-bold py-5 px-8 rounded-2xl text-2xl text-center shadow-lg">
                   ✓ Изучено
                 </div>
               )}
