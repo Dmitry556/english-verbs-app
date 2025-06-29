@@ -73,29 +73,20 @@ const App: React.FC = () => {
       learnedWords: newLearnedWords
     }));
 
-    // Check if this completes the day
+    // Check if this completes the day (just for marking as complete, no auto-advance)
     const dayWords = Array.from({length: 5}, (_, i) => (currentDay - 1) * 5 + i);
     const completedWordsInDay = dayWords.filter(id => newLearnedWords.has(id)).length;
     
     if (completedWordsInDay === 5) {
-      // Day completed - mark as complete and auto-advance to next day
+      // Day completed - mark as complete but don't auto-advance
       setProgress(prev => ({
         ...prev,
         completedDays: new Set([...prev.completedDays, currentDay])
       }));
-      
-      // Auto-advance to next day after a short delay
-      setTimeout(() => {
-        if (currentDay < 10) {
-          setCurrentDay(prev => prev + 1);
-          setCurrentWordIndex(0);
-          setProgress(prev => ({
-            ...prev,
-            day: currentDay + 1
-          }));
-        }
-      }, 1500);
-    } else if (currentWordIndex < currentWords.length - 1) {
+    }
+
+    // Always just move to next card if available
+    if (currentWordIndex < currentWords.length - 1) {
       nextCard();
     }
   };
@@ -207,14 +198,40 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Day Progress */}
-        <div className="text-center mb-6">
-          <div className="text-white font-medium text-lg">
-            {getDayProgress()}/5 слов изучено
+        {/* Day Navigation */}
+        <div className="flex justify-between items-center mb-6">
+          <button
+            onClick={() => {
+              if (currentDay > 1) {
+                setCurrentDay(prev => prev - 1);
+                setCurrentWordIndex(0);
+                setProgress(prev => ({ ...prev, day: currentDay - 1 }));
+              }
+            }}
+            disabled={currentDay === 1}
+            className="px-4 py-2 bg-white/20 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            ← День {currentDay - 1}
+          </button>
+          <div className="text-white font-medium text-center">
+            <div className="text-lg">{getDayProgress()}/5 слов</div>
+            <div className="text-sm opacity-80">
+              {getDayProgress() === 5 ? '✅ Завершён' : 'Изучается'}
+            </div>
           </div>
-          <div className="text-white/70 text-sm mt-1">
-            {getDayProgress() === 5 ? 'День завершён! 🎉' : 'Изучите все слова чтобы перейти дальше'}
-          </div>
+          <button
+            onClick={() => {
+              if (currentDay < 10) {
+                setCurrentDay(prev => prev + 1);
+                setCurrentWordIndex(0);
+                setProgress(prev => ({ ...prev, day: currentDay + 1 }));
+              }
+            }}
+            disabled={currentDay === 10}
+            className="px-4 py-2 bg-white/20 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            День {currentDay + 1} →
+          </button>
         </div>
 
         {/* Progress Dots */}
