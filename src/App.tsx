@@ -18,6 +18,7 @@ const App: React.FC = () => {
   });
   const [isCardVisible, setIsCardVisible] = useState(true);
   const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [animationKey, setAnimationKey] = useState(0);
   const cardRef = useRef<HTMLDivElement>(null);
 
   // Load progress from localStorage
@@ -47,6 +48,11 @@ const App: React.FC = () => {
 
   const currentWords = wordsData[currentDay - 1] || [];
   const currentWord = currentWords[currentWordIndex];
+
+  // Trigger animation whenever word changes
+  useEffect(() => {
+    setAnimationKey(prev => prev + 1);
+  }, [currentDay, currentWordIndex]);
 
   const speakText = (text: string) => {
     if ('speechSynthesis' in window) {
@@ -254,7 +260,7 @@ const App: React.FC = () => {
 
             {/* Emoji Visual Learning */}
             <div className="w-full h-48 rounded-xl mb-4 flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100 border-2 border-blue-200 shadow-lg">
-              <div className="text-8xl mb-3 emoji-gentle-bounce">
+              <div key={animationKey} className="text-8xl mb-3 emoji-gentle-bounce">
                 {(() => {
                   const emojiMap: { [key: string]: string } = {
                     'cat': '🐱', 'dog': '🐶', 'happy': '😊', 'water': '💧', 'book': '📖',
