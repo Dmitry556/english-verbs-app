@@ -253,8 +253,8 @@ const App: React.FC = () => {
             </div>
 
             {/* Emoji Visual Learning */}
-            <div className="w-full h-48 rounded-xl mb-4 flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100 border-2 border-blue-200 shadow-lg">
-              <div className="text-9xl animate-bounce">
+            <div className="w-full h-48 rounded-xl mb-4 flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100 border-2 border-blue-200 shadow-lg">
+              <div className="text-8xl mb-3 emoji-gentle-bounce">
                 {(() => {
                   const emojiMap: { [key: string]: string } = {
                     'cat': '🐱', 'dog': '🐶', 'happy': '😊', 'water': '💧', 'book': '📖',
@@ -271,14 +271,17 @@ const App: React.FC = () => {
                   return emojiMap[currentWord.en.toLowerCase()] || '🎬';
                 })()}
               </div>
+              <div className="text-3xl font-bold text-blue-800">
+                {currentWord.en}
+              </div>
             </div>
 
-            {/* English Word */}
+            {/* Russian Translation & Audio */}
             <div className="text-center mb-4">
               <div className="flex items-center justify-center gap-3 mb-2">
-                <h2 className="text-3xl font-bold text-gray-800">
-                  {currentWord.en}
-                </h2>
+                <div className="text-2xl text-gray-600 font-medium">
+                  {currentWord.ru}
+                </div>
                 <button
                   onClick={() => speakText(currentWord.en)}
                   className="speak-button"
@@ -286,9 +289,6 @@ const App: React.FC = () => {
                 >
                   🔊
                 </button>
-              </div>
-              <div className="text-xl text-gray-600 mb-2">
-                {currentWord.ru}
               </div>
             </div>
 

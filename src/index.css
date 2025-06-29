@@ -46,4 +46,30 @@
   .speak-button:active {
     @apply bg-blue-700;
   }
+
+  .emoji-gentle-bounce {
+    animation: gentleBounce 2s ease-out;
+  }
+
+  @keyframes gentleBounce {
+    0% { 
+      transform: translateY(-20px) scale(1.2);
+      animation-timing-function: ease-in;
+    }
+    25% { 
+      transform: translateY(0px) scale(1);
+      animation-timing-function: ease-out;
+    }
+    50% { 
+      transform: translateY(-10px) scale(1);
+      animation-timing-function: ease-in;
+    }
+    75% { 
+      transform: translateY(0px) scale(1);
+      animation-timing-function: ease-out;
+    }
+    100% { 
+      transform: translateY(0px) scale(1);
+    }
+  }
 }
