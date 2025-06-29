@@ -5,17 +5,20 @@ interface Progress {
   day: number;
   learnedWords: Set<number>;
   completedDays: Set<number>;
+  repeatedDays: Set<number>;
 }
 
 const App: React.FC = () => {
   const [showWelcome, setShowWelcome] = useState(true);
   const [showDayComplete, setShowDayComplete] = useState(false);
+  const [isReviewMode, setIsReviewMode] = useState(false);
   const [currentDay, setCurrentDay] = useState(1);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [progress, setProgress] = useState<Progress>({
     day: 1,
     learnedWords: new Set(),
-    completedDays: new Set()
+    completedDays: new Set(),
+    repeatedDays: new Set()
   });
   const [isCardVisible, setIsCardVisible] = useState(true);
   const [animationKey, setAnimationKey] = useState(0);
@@ -28,7 +31,8 @@ const App: React.FC = () => {
       setProgress({
         ...parsed,
         learnedWords: new Set(parsed.learnedWords || parsed.learnedVerbs || []),
-        completedDays: new Set(parsed.completedDays)
+        completedDays: new Set(parsed.completedDays),
+        repeatedDays: new Set(parsed.repeatedDays || [])
       });
       setCurrentDay(parsed.day);
       setShowWelcome(false); // Hide welcome if user has progress
@@ -40,7 +44,8 @@ const App: React.FC = () => {
     const progressToSave = {
       ...progress,
       learnedWords: Array.from(progress.learnedWords),
-      completedDays: Array.from(progress.completedDays)
+      completedDays: Array.from(progress.completedDays),
+      repeatedDays: Array.from(progress.repeatedDays)
     };
     localStorage.setItem('wordsProgress', JSON.stringify(progressToSave));
   }, [progress]);
@@ -63,6 +68,25 @@ const App: React.FC = () => {
   };
 
   const handleLearnedWord = () => {
+    // In review mode, just move to next card without tracking progress
+    if (isReviewMode) {
+      if (currentWordIndex < currentWords.length - 1) {
+        nextCard();
+      } else {
+        // Review complete - mark day as repeated
+        setProgress(prev => ({
+          ...prev,
+          repeatedDays: new Set([...prev.repeatedDays, currentDay])
+        }));
+        
+        // Show completion message for review
+        setTimeout(() => {
+          setShowDayComplete(true);
+        }, 500);
+      }
+      return;
+    }
+
     const wordId = (currentDay - 1) * 5 + currentWordIndex;
     const newLearnedWords = new Set(progress.learnedWords);
     newLearnedWords.add(wordId);
@@ -101,6 +125,18 @@ const App: React.FC = () => {
       }
       setIsCardVisible(true);
     }, 300);
+  };
+
+  const startReviewMode = (day: number) => {
+    setCurrentDay(day);
+    setCurrentWordIndex(0);
+    setIsReviewMode(true);
+    setShowDayComplete(false);
+  };
+
+  const exitReviewMode = () => {
+    setIsReviewMode(false);
+    setCurrentWordIndex(0);
   };
 
 
@@ -143,25 +179,38 @@ const App: React.FC = () => {
   if (showDayComplete) {
     const nextDay = currentDay + 1;
     const isLastDay = currentDay === 10;
+    const isReviewComplete = isReviewMode;
     
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-600 to-blue-600 p-4">
         <div className="max-w-md mx-auto text-center">
-          <div className="text-8xl mb-6">🎉</div>
+          <div className="text-8xl mb-6">{isReviewComplete ? '🔄' : '🎉'}</div>
           <h1 className="text-4xl font-bold text-white mb-4">
-            Отлично!
+            {isReviewComplete ? 'Повторение завершено!' : 'Отлично!'}
           </h1>
           <p className="text-white/90 text-xl mb-2 font-semibold">
-            День {currentDay} завершён!
+            День {currentDay} {isReviewComplete ? 'повторён!' : 'завершён!'}
           </p>
           <p className="text-white/80 text-lg mb-8 leading-relaxed">
-            {isLastDay 
-              ? "Поздравляем! Вы изучили все 50 слов!" 
-              : `Вы изучили 5 новых слов.\nПереходим к дню ${nextDay}?`
+            {isReviewComplete 
+              ? "Вы успешно повторили все слова этого дня!"
+              : isLastDay 
+                ? "Поздравляем! Вы изучили все 50 слов!" 
+                : `Вы изучили 5 новых слов.\nПереходим к дню ${nextDay}?`
             }
           </p>
           
-          {!isLastDay ? (
+          {isReviewComplete ? (
+            <button
+              onClick={() => {
+                exitReviewMode();
+                setShowDayComplete(false);
+              }}
+              className="w-full bg-white text-green-600 font-bold text-xl py-5 px-8 rounded-2xl hover:bg-green-50 transition-colors shadow-lg mb-4"
+            >
+              Вернуться к обучению
+            </button>
+          ) : !isLastDay ? (
             <button
               onClick={() => {
                 setCurrentDay(nextDay);
@@ -178,8 +227,9 @@ const App: React.FC = () => {
               onClick={() => {
                 setCurrentDay(1);
                 setCurrentWordIndex(0);
-                setProgress({ day: 1, learnedWords: new Set(), completedDays: new Set() });
+                setProgress({ day: 1, learnedWords: new Set(), completedDays: new Set(), repeatedDays: new Set() });
                 setShowDayComplete(false);
+                setIsReviewMode(false);
                 localStorage.removeItem('wordsProgress');
               }}
               className="w-full bg-white text-green-600 font-bold text-xl py-5 px-8 rounded-2xl hover:bg-green-50 transition-colors shadow-lg mb-4"
@@ -216,8 +266,18 @@ const App: React.FC = () => {
             Изучение английских слов
           </h1>
           <div className="text-white/80 text-lg">
-            День {currentDay} из 10
+            День {currentDay} из 10 {isReviewMode && '(Повторение)'}
           </div>
+          {isReviewMode && (
+            <div className="mt-2">
+              <button
+                onClick={exitReviewMode}
+                className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              >
+                Выйти из режима повторения
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Day Navigation */}
@@ -240,6 +300,19 @@ const App: React.FC = () => {
             <div className="text-sm opacity-80">
               {getDayProgress() === 5 ? '✅ Завершён' : 'Изучается'}
             </div>
+            {progress.completedDays.has(currentDay) && !isReviewMode && (
+              <button
+                onClick={() => startReviewMode(currentDay)}
+                className="mt-2 bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-lg text-xs font-medium transition-colors"
+              >
+                🔄 Повторить день
+              </button>
+            )}
+            {progress.repeatedDays.has(currentDay) && (
+              <div className="text-xs text-green-300 mt-1">
+                ↻ Повторён {progress.repeatedDays.has(currentDay) ? '1 раз' : ''}
+              </div>
+            )}
           </div>
           <button
             onClick={() => {
@@ -258,18 +331,36 @@ const App: React.FC = () => {
 
         {/* Progress Dots */}
         <div className="flex justify-center gap-2 mb-6">
-          {Array.from({length: 10}, (_, i) => (
-            <div
-              key={i}
-              className={`w-3 h-3 rounded-full progress-circle ${
-                progress.completedDays.has(i + 1)
-                  ? 'bg-green-400'
-                  : i + 1 === currentDay
-                  ? 'bg-yellow-400'
-                  : 'bg-white/30'
-              }`}
-            />
-          ))}
+          {Array.from({length: 10}, (_, i) => {
+            const dayNum = i + 1;
+            const isCompleted = progress.completedDays.has(dayNum);
+            const isRepeated = progress.repeatedDays.has(dayNum);
+            const isCurrent = dayNum === currentDay;
+            
+            return (
+              <div
+                key={i}
+                className={`w-3 h-3 rounded-full progress-circle relative ${
+                  isCompleted && isRepeated
+                    ? 'bg-blue-400 ring-2 ring-blue-200'
+                    : isCompleted
+                    ? 'bg-green-400'
+                    : isCurrent
+                    ? 'bg-yellow-400'
+                    : 'bg-white/30'
+                }`}
+                title={
+                  isCompleted && isRepeated
+                    ? `День ${dayNum}: Завершён и повторён`
+                    : isCompleted
+                    ? `День ${dayNum}: Завершён`
+                    : isCurrent
+                    ? `День ${dayNum}: Текущий`
+                    : `День ${dayNum}: Не начат`
+                }
+              />
+            );
+          })}
         </div>
 
         {/* Word Card - Bigger */}
@@ -358,7 +449,14 @@ const App: React.FC = () => {
 
             {/* Action Button - Full Width */}
             <div className="text-center">
-              {!isCurrentWordLearned() ? (
+              {isReviewMode ? (
+                <button
+                  onClick={handleLearnedWord}
+                  className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-5 px-8 rounded-2xl transition-colors text-2xl shadow-lg"
+                >
+                  ↻ Повторил
+                </button>
+              ) : !isCurrentWordLearned() ? (
                 <button
                   onClick={handleLearnedWord}
                   className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-5 px-8 rounded-2xl transition-colors text-2xl shadow-lg"
